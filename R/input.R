@@ -11,7 +11,7 @@
 #' @returns Data matrix with fitting structure to be used in \code{fit_TIM_2P()}.
 #'
 #' @export
-data.prep <- function (file, format, folder) {
+data_prep <- function (file, format, folder) {
     if (!format %in% c("AMOCS")){
         stop("No valid raw data format supplied")
     }
@@ -22,7 +22,7 @@ data.prep <- function (file, format, folder) {
     } else {
         f.name <- paste(file, sep = "")
     }
-    if (format = "AMOCS"){
+    if (format == "AMOCS"){
         raw <- read.table(f.name,
                           col.names=c("staircase", "trial", "standard", "test", "order", "response"))
         tabled = table(raw[,c("test", "order","response")])
@@ -37,3 +37,11 @@ data.prep <- function (file, format, folder) {
     }
     return (freq)
 }
+
+
+## #' Simulate Data from Underlying Model
+## #'
+## #' @export
+## simulate_data = function(){
+##
+## }

@@ -118,33 +118,33 @@ fit_TIM_2P <- function(Data, Standard, Format,
     WidthBounds <- sort(WidthBounds)
 
     ### Check conditions ###
-    if (length(dim(Data))!=2 || nrow(Data)!=7 || !is.double(Data)) {
+    if (length(dim(Data))!=2 || nrow(Data)!=7 || !is.numeric(Data)) {
         stop("Invalid Data (must be a 2D numeric matrix with 7 rows)")}
-    if (!is.double(Standard) || length(Standard)!=1 || (is.infinite(Standard) && Standard>0)) {
+    if (!is.numeric(Standard) || length(Standard)!=1 || (is.infinite(Standard) && Standard>0)) {
         stop("Invalid Standard (must be a real scalar, including -Inf)")}
     if (!is.character(Format) || !any(identical(Format,"ternary"),
                                       identical(Format,"2afc"),
                                       identical(Format,"equality"))) {
         stop("Wrong Format (must be 'ternary', '2AFC', or 'equality', case insensitive)")}
-    if (!is.double(AlphaBounds)) {
+    if (!is.numeric(AlphaBounds)) {
         stop("Invalid AlphaBounds (must be reals)")}
     if (length(AlphaBounds)!=2 ) {
         stop("Invalid size of AlphaBounds (must have two components only)")}
     if (identical(AlphaBounds[1], AlphaBounds[2])) {
         stop("Invalid contents of AlphaBounds (components must have different values)")}
-    if (any(!is.double(BetaBounds), BetaBounds<0)) {
+    if (any(!is.numeric(BetaBounds), BetaBounds<0)) {
         stop("Invalid BetaBounds (must be non-negative reals)")}
     if (length(BetaBounds)!=2 ) {
         stop("Invalid size of BetaBounds (must have two components only)")}
     if (identical(BetaBounds[1], BetaBounds[2])) {
         stop("Invalid contents of BetaBounds (components must have different values)")}
-    if (!is.double(Delta1Bounds)) {
+    if (!is.numeric(Delta1Bounds)) {
         stop("Invalid Delta1Bounds (must be reals)")}
     if (length(Delta1Bounds)!=2 ) {
         stop("Invalid size of Delta1Bounds (must have two components only)")}
     if (identical(Delta1Bounds[1], Delta1Bounds[2])) {
         stop("Invalid contents of Delta1Bounds (components must have different values)")}
-    if (any(!is.double(WidthBounds), WidthBounds<0)) {
+    if (any(!is.numeric(WidthBounds), WidthBounds<0)) {
         stop("Invalid WidthBounds (must be non-negative reals)")}
     if (length(WidthBounds)!=2) {
         stop("Invalid size of WidthBounds (must have two components only)")}
@@ -152,42 +152,42 @@ fit_TIM_2P <- function(Data, Standard, Format,
         stop("Invalid contents of WidthBounds (components must have different values)")}
     if (identical(Format,"2afc") && identical(WidthBounds[1], WidthBounds[2]) && WidthBounds[1]!=0) {
         stop("Invalid contents of WidthBounds (for 2AFC data, components must have different values or zeros)")}
-    if (!is.double(AlphaStart)) {
+    if (!is.numeric(AlphaStart)) {
         stop("Invalid AlphaStart (must be reals)")}
     if (any(AlphaStart>AlphaBounds[2]) || any(AlphaStart<AlphaBounds[1])) {
         stop("Invalid AlphaStart (one or more values are not within AlphaBounds)")}
-    if (any(!is.double(BetaStart), BetaStart<0)) {
+    if (any(!is.numeric(BetaStart), BetaStart<0)) {
         stop("Invalid BetaStart (must be non-negative reals)")}
     if (any(BetaStart>BetaBounds[2]) || any(BetaStart<BetaBounds[1])) {
         stop("Invalid BetaStart (one or more values are not within BetaBounds)")}
-    if (!is.double(Delta1Start)) {
+    if (!is.numeric(Delta1Start)) {
         stop("Invalid Delta1Start (must be reals)")}
     if (any(Delta1Start>Delta1Bounds[2]) || any(Delta1Start<Delta1Bounds[1])) {
         stop("Invalid Delta1Start (one or more values are not within Delta1Bounds)")}
-    if (any(!is.double(WidthStart), WidthStart<0)) {
+    if (any(!is.numeric(WidthStart), WidthStart<0)) {
         stop("Invalid WidthStart (must be non-negative reals)")}
     if (any(WidthStart>WidthBounds[2]) || any(WidthStart<WidthBounds[1])) {
         stop("Invalid WidthStart (one or more values are not within WidthBounds)")}
-    if (any(!is.double(EpsStart), EpsStart<0, EpsStart>1)) {
+    if (any(!is.numeric(EpsStart), EpsStart<0, EpsStart>1)) {
         stop("Invalid EpsStart (must be reals in [0,1])")}
-    if (any(!is.double(KappaStart), KappaStart<0, KappaStart>1)) {
+    if (any(!is.numeric(KappaStart), KappaStart<0, KappaStart>1)) {
         stop("Invalid KappaStart (must be reals in [0,1])")}
     if (any(Data[2:7,]<0)) {
         stop("Negative counts in rows 2-7 of Data ")}
     if (identical(Format,"2afc") && any(Data[c(3,6),]>0)) {
         stop("Rows 3 and 6 of array Data must be filled with zeros when Format='2AFC'")}
-    if (identical(Format,"2afc") && is.double(Model) &&
+    if (identical(Format,"2afc") && is.numeric(Model) &&
         (any(Model==0)||any(Model==3) || any(Model==5) || any(Model==7))){
         stop("Model cannot be set to 0, 3, 5, or 7 when Format='2AFC'")}
     if (identical(Format,"equality") && any(Data[c(2,5),]>0)){
         stop("Rows 2 and 5 of array Data must be filled with zeros when Format='equality'")}
-    if (identical(Format,"equality") && is.double(Model) &&
+    if (identical(Format,"equality") && is.numeric(Model) &&
         (any(Model==0)||any(Model==4) || any(Model==6) || any(Model==7))) {
         stop("Model cannot be set to 0, 4, 6, or 7 when Format='equality'")}
     if (is.character(Model) && !identical(Model,"best")) {
         stop("Invalid value for Model (the only valid string is 'best')")}
     is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
-    if (is.double(Model) &&
+    if (is.numeric(Model) &&
         (length(Model)>2 || !is.wholenumber(Model) || any(Model<0) || any(Model>7))) {
         stop("Invalid value for Model (components must be integers between 0 and 7)")}
     if (!identical(toupper(Criterion),"BIC") && !identical(toupper(Criterion),"LOGL")) {
@@ -200,6 +200,17 @@ fit_TIM_2P <- function(Data, Standard, Format,
         stop("Invalid value for Disp (must be a logical scalar)")}
 
     ### Main ###
+    output = fitmodel(Data, Standard, Format,
+                      AlphaBounds, BetaBounds, Delta1Bounds, WidthBounds,
+                      AlphaStart, BetaStart, Delta1Start, WidthStart, EpsStart, KappaStart,
+                      Model, Criterion, Type, Plot, Disp)
+    return(output)
+}
+
+fit_model = function(Data, Standard, Format,
+                     AlphaBounds, BetaBounds, Delta1Bounds, WidthBounds,
+                     AlphaStart, BetaStart, Delta1Start, WidthStart, EpsStart, KappaStart,
+                     Model, Criterion, Type, Plot, Disp){
     useBIC <- identical(toupper(Criterion),"BIC")
     same_mu <- isTRUE(identical (Type,"same") || is.infinite(Standard))
     ter <- identical(Format,"ternary")
@@ -253,9 +264,9 @@ fit_TIM_2P <- function(Data, Standard, Format,
             # proceed through initial values
             niter <- 0
             out.par <- matrix(NA,NumIter,50)
-            out.value <- vector("double",NumIter)+NA
+            out.value <- vector("numeric",NumIter)+NA
             out.counts <-matrix(NA,NumIter,2)
-            out.convg <- vector("double",NumIter)+NA
+            out.convg <- vector("numeric",NumIter)+NA
             out.msg <- vector("character",NumIter)
             OnBound <- array(NaN, c(NumIter,50,2))
             for (AlphaInit in AlphaStart) {
