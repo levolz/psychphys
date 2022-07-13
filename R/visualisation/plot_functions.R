@@ -1,20 +1,20 @@
 # plot psychophysical function
-plot_psychphys <- function(pars, Standard, Lev, F1, U1, S1,
-                           F2, U2, S2, PSE, Thr_84, logs){
+plot_psychphys <- function(pars, standard, lev, f1, u1, s1,
+                           f2, u2, s2, pse, thr_84, logs){
 
 
 }
 
 # plot decision boundary function
-plot_boundary <- function(pars, Standard, Lev, F1, U1, S1,
-                           F2, U2, S2, PSE, Thr_84, logs){
+plot_boundary <- function(pars, standard, lev, f1, u1, s1,
+                           f2, u2, s2, pse, thr_84, logs){
 
 
 }
 
 # plot psychometric
-plot_psychmet <- function(pars, Standard, Lev, F1, U1, S1,
-                          F2, U2, S2, PSE, Thr_84, logs){
+plot_psychmet <- function(pars, standard, lev, f1, u1, s1,
+                          f2, u2, s2, pse, thr_84, logs){
 
 
 }
