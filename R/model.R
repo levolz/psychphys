@@ -105,7 +105,7 @@
 fit_TIM_2P <- function(data, standard, format,
                        alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
                        alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
-                       model = "best", criterion = "LogL", type, plot = FALSE, disp = FALSE){
+                       model, criterion, type, plot_graphs = FALSE, disp = FALSE){
 
     if (is.character(model)) {
         model <- tolower(model)
@@ -154,7 +154,7 @@ fit_TIM_2P <- function(data, standard, format,
 
     if (!is.numeric(alpha_start) || any(alpha_start>alpha_bounds[2]) || any(alpha_start<alpha_bounds[1])) {
         stop("Invalid alpha_start: must be real number within supplied alpha_bounds")}
-    if (!is.numeric(beta_start) || beta_start<0 || any(beta_start>beta_bounds[2]) || any(beta_start<beta_bounds[1])) {
+    if (!is.numeric(beta_start) || any(beta_start<0) || any(beta_start>beta_bounds[2]) || any(beta_start<beta_bounds[1])) {
         stop("Invalid beta_start: must be non-negative real number within supplied beta_bounds)")}
     if (!is.numeric(delta1_start) || any(delta1_start>delta1_bounds[2]) || any(delta1_start<delta1_bounds[1])) {
         stop("Invalid delta1_start: must be real number within supplied delta1_bounds")}
@@ -164,7 +164,7 @@ fit_TIM_2P <- function(data, standard, format,
 
     if (any(!is.numeric(eps_start), eps_start<0, eps_start>1)) {
         stop("Invalid eps_start (must be reals in [0,1])")}
-    if (any(!is.numeric(kappa_start), kappa_start<0, kappa_start>1)) {
+    if (any(!is.wholeNumber(kappa_start), kappa_start<0, kappa_start>1)) {
         stop("Invalid kappa_start (must be reals in [0,1])")}
 
     if (any(data[2:7,]<0)) {
@@ -179,13 +179,19 @@ fit_TIM_2P <- function(data, standard, format,
     if (identical(format,"equality") && is.numeric(model) &&
         (any(model %in% c(0, 4, 6, 7)))) {
         stop("model cannot be set to 0, 4, 6, or 7 when format='equality'")}
-    if (is.character(model) && !identical(model,"best")) {
-        stop("Invalid value for model (the only valid string is 'best')")}
-    is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
-    if (!is.wholenumber(model) || length(model)>2 || any(model<0) || any(model>7)) {
-        stop("Invalid value for model: components must be integers between 0 and 7")}
-    if (!identical(toupper(criterion),"BIC") && !identical(toupper(criterion),"LOGL")) {
-        stop("Wrong string for criterion (must be 'LogL' or 'BIC', case insensitive)")}
+    if (is.character(model)) {
+        if (identical(model,"best")){
+            if (missing(criterion) || (!identical(toupper(criterion),"BIC") && !identical(toupper(criterion),"LOGL"))) {
+                stop("criterion must be either of c('LogL','BIC')")
+            }
+        } else {
+            stop("Invalid value for model (the only valid string is 'best')")
+        }
+    } else if (!is.integer(model) || length(model)>2 || any(model<0) || any(model>7)) {
+        stop('Invalid value for model: components must be integers between 0 and 7 (or "best")')
+    } else {
+        criterion = "Not applicable"
+    }
     if (!identical(type,"same") && !identical(type,"diff")) {
         stop("Wrong string for type (must be 'same' or 'diff', case insensitive)")}
     if (!is.logical(plot) || length (plot)!=1) {
@@ -199,7 +205,11 @@ fit_TIM_2P <- function(data, standard, format,
     output = fit_model(data, standard, format,
                        alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
                        alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
-                       model, criterion, type, plot, disp)
+                       model, criterion, type, plot_graphs, disp)
+
+    if (plot_graphs){
+        #plot_results()
+    }
     return(output)
 }
 
@@ -259,10 +269,10 @@ fit_model = function(data, standard, format,
             # proceed through initial values
             niter <- 0
             out.par <- matrix(NA,num_iter,50)
-            out.value <- vector("numeric",num_iter)+NA
+            out.value <- numeric(NA, num_iter)
             out.counts <-matrix(NA,num_iter,2)
-            out.convg <- vector("numeric",num_iter)+NA
-            out.msg <- vector("character",num_iter)
+            out.convg <- numeric(NA, num_iter)
+            out.msg <- character(num_iter)
             OnBound <- array(NaN, c(num_iter,50,2))
             for (AlphaInit in alpha_start) {
                 for (BetaInit in beta_start) {
@@ -472,7 +482,6 @@ fit_model = function(data, standard, format,
     }
     if (noU) params[c(6, 8, 12, 13, 17, 21, 22)] <- NA
     ifelse (det, type2 <- "same (detection)", type2 <- type)
-    ifelse (num_models==1, criterion2 <- "not applicable", criterion2 <- criterion)
     if (ter) {
         format2 <- paste(format, " (respond first, second, or uncertain)")
     } else if (bin) {
@@ -489,7 +498,7 @@ fit_model = function(data, standard, format,
                    standard = standard,
                    Usermodel = model,
                    fitted_model = chosen_model,
-                   criterion = criterion2,
+                   criterion = criterion,
                    type = type2,
                    num_free_parameters = numfree,
                    num_cells = factor*sum(n_1>0) + factor*sum(n_2>0),
