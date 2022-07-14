@@ -181,8 +181,8 @@ fit_TIM_2P <- function(data, standard, format,
         stop("model cannot be set to 0, 4, 6, or 7 when format='equality'")}
     if (is.character(model) && !identical(model,"best")) {
         stop("Invalid value for model (the only valid string is 'best')")}
-    # is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
-    if (!is.integer(model) || length(model)>2 || any(model<0) || any(model>7)) {
+    is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
+    if (!is.wholenumber(model) || length(model)>2 || any(model<0) || any(model>7)) {
         stop("Invalid value for model: components must be integers between 0 and 7")}
     if (!identical(toupper(criterion),"BIC") && !identical(toupper(criterion),"LOGL")) {
         stop("Wrong string for criterion (must be 'LogL' or 'BIC', case insensitive)")}

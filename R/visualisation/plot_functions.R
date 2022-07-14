@@ -38,7 +38,13 @@ plot_psychphys <- function(model){
                              xend = thr_84, yend = y[1],
                              linetype = 3)) +
             geom_point(aes(x = thr_84, y = mu_thr), color = "blue") +
-            scale_linetype_identity()
+            scale_linetype_identity() +
+            annotate("text", label = paste("\u03B1 = ", round(alpha_t, 3),
+                                           "\n\u03B2 = ", round(beta_t, 3),
+                                           "\n\u03B8 = ", round(thr_84, 3), sep = ""),
+                     y = (xy[4] - 0.05 * (xy[4]-xy[3])),
+                     x = (xy[2] - 0.975 * (xy[2]-xy[1])),
+                     hjust = 0)
     } else {
         psychphys <- psychphys + #add 'Standard' text
             geom_segment(aes(x = xinf, y = mu_st,
@@ -47,6 +53,8 @@ plot_psychphys <- function(model){
             geom_segment(aes(x = standard, y = mu_st,
                              xend = standard, yend = y[1],
                              linetype = 3)) +
+            annotate("text", label = "Standard",
+                     x = standard, y = mu_st + 0.025*(xy[4]-xy[3])) +
             geom_point(aes(x = standard, y = mu_st), color = "blue") +
             scale_linetype_identity()
 
@@ -55,7 +63,20 @@ plot_psychphys <- function(model){
                 geom_segment(aes(x = pse, y = mu_st,
                                  xend = pse, yend = y[1],
                                  linetype = 3)) +
-                geom_point(aes(x = pse, y = mu_st), color = "red")
+                annotate("text", label = "PSE",
+                         x = pse - 0.025*(xy[2]-xy[1]), y = mu_st + 0.025*(xy[4]-xy[3])) +
+                geom_point(aes(x = pse, y = mu_st), color = "red") +
+                annotate("text", label = paste("\u03B2 = ", round(beta_t, 3),
+                                               "\nPOE - PSE = ", round(standard - pse, 3), sep=""),
+                         y = (xy[4] - 0.05 * (xy[4]-xy[3])),
+                         x = (xy[2] - 0.975 * (xy[2]-xy[1])),
+                         hjust = 0)
+        } else {
+            psychphys <- psychphys +
+            annotate("text", label = paste("\n\u03B2 = ", round(beta_t, 3)),
+                     y = (xy[4] - 0.05 * (xy[4]-xy[3])),
+                     x = (xy[2] - 0.975 * (xy[2]-xy[1])),
+                     hjust = 0)
         }
     }
 
