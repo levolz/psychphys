@@ -62,6 +62,7 @@ plot_psychphys <- function(model){
     return(psychphys)
 }
 
+
 # plot decision boundary function
 plot_boundary <- function(model){
 
@@ -88,24 +89,24 @@ plot_boundary <- function(model){
 }
 
 # plot psychometric
-plot_psychmet <- function(params, standard, lev, f1, u1, s1,
-                          f2, u2, s2, pse, thr_84, logs){
+plot_psychmet <- function(model){
 
 
 }
 
 
 # wrapper function
-plot_results <- function(plot_id = 1:4){
+plot_results <- function(model,to_plot = 1:3){
 
-    if(1 %in% plot_id){
-        p1 <- plot_psychphys()
+    if(1 %in% to_plot){
+        p1 <- plot_psychphys(model)
     }
-    if(2 %in% plot_id){
-        p2 <- plot_boundary()
+    if(2 %in% to_plot){
+        p2 <- plot_boundary(model)
     }
-    if(3 %in% plot_id){
-        p3 <- plot_psychmet()
+    if(3 %in% to_plot){
+        p3 <- plot_psychmet(model)
     }
 
+    cowplot::plot_grid(plotlist=mget(paste0("p", to_plot)))
 }
