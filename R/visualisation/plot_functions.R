@@ -1,6 +1,5 @@
-# plot psychophysical function
+#' plot psychophysical function
 plot_psychphys <- function(model){
-
     alpha_st <- model$alpha_st
     alpha_t <- model$alpha_t
     beta_st <- model$beta_st
@@ -62,8 +61,8 @@ plot_psychphys <- function(model){
     return(psychphys)
 }
 
-
-# plot decision boundary function
+#' plot decision boundary function
+#' @import ggplot
 plot_boundary <- function(model){
 
     d1 = model$delta_1; d2 = model$delta_2
@@ -88,16 +87,17 @@ plot_boundary <- function(model){
     return(p)
 }
 
-# plot psychometric
+#' plot psychometric
 plot_psychmet <- function(model){
 
 
 }
 
 
-# wrapper function
+#' plotting wrapper function
+#' @import ggplot
+#' @importFrom cowplot plot_grid
 plot_results <- function(model,to_plot = 1:3){
-
     if(1 %in% to_plot){
         p1 <- plot_psychphys(model)
     }
