@@ -5,11 +5,11 @@
 #' @export
 print.fit <- function(output){
     cat ("----------------------------------------------------------------", "\n")
-    cat (output$Problem,"\n")
+    cat (output$problem,"\n")
     cat ("----------------------------------------------------------------", "\n")
-    rownames (output$Data) <- c("Lev", " F1", " U1", " S1"," F2", " U2", " S2")
-    colnames (output$Data) <- rep("",times=dim(output$Data)[2])
-    print.table (output$Data); cat("   ")
+    rownames (output$data) <- c("Lev", " F1", " U1", " S1"," F2", " U2", " S2")
+    colnames (output$data) <- rep("",times=dim(output$data)[2])
+    print.table (output$data); cat("   ")
     cat (paste (names(output[-c(1,3)]),":", " ",output[-c(1,3)], "\n", sep=""))
     invisible (output)
 }
@@ -21,14 +21,14 @@ print.fit <- function(output){
 #' @importFrom stats dnorm
 #'
 #' @export
-plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_84, logs) {
-    Alpha_st <- pars[1]; Alpha_t <- pars[2]; Beta_st <- pars[3]; Beta_t <- pars[4]
-    Delta_1 <- pars[5]; Delta_2 <- pars[6]; lapses <- pars[7:24]
+plot_results <- function(pars, standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_84, logs) {
+    alpha_st <- pars[1]; alpha_t <- pars[2]; beta_st <- pars[3]; beta_t <- pars[4]
+    delta_1 <- pars[5]; delta_2 <- pars[6]; lapses <- pars[7:24]
     same <- logs[1]; ter <- logs[2]; bin <- logs[3]; equ <- logs[4]; det <- logs[5]
     xinf <- min(Lev);  xsup <- max(Lev)
     step <- (xsup-xinf)/800
     xval <- seq(xinf,xsup,step)
-    psycho <- Psy(Standard, xval, Alpha_st, Beta_st, Alpha_t, Beta_t, Delta_1, Delta_2, lapses)
+    psycho <- Psy(standard, xval, alpha_st, beta_st, alpha_t, beta_t, delta_1, delta_2, lapses)
     P_F1 <- psycho[1,]; P_U1 <- psycho[2,]; P_S1 <- psycho[3,]
     P_F2 <- psycho[4,]; P_U2 <- psycho[5,]; P_S2 <- psycho[6,]
     #windows(5,5, rescale='R') # Only works under windows OS
@@ -105,8 +105,8 @@ plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_8
         points(Lev, U2/n_2, type='p', col='gray', lwd=lw)
     }
     if (!det) {
-        lines(c(Standard, Standard),c(0, 1),lty=3, col='black')
-        if (is.double(PSE)) {lines(c(PSE, PSE),c(0, 1),col='black')
+        lines(c(standard, standard),c(0, 1),lty=3, col='black')
+        if (is.numeric(PSE)) {lines(c(PSE, PSE),c(0, 1),col='black')
         } else {
             lines(c(Thr_84, Thr_84),c(0, 1),col='black')}
     }
@@ -117,24 +117,24 @@ plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_8
     dev.new(width=18, height=6)
     par(mfrow=c(1,3), mai=c(0.8,0.5,0.8,0.1), cex=1.05, mex=0.8, xaxs='i', yaxs='i', tck=-0.03, xpd=T,
         family='sans', pty='s',las=1, pch=16)
-    mu_st <- mu(Standard,Alpha_st,Beta_st)
-    yval <- mu(xval,Alpha_t,Beta_t)
+    mu_st <- mu(standard,alpha_st,beta_st)
+    yval <- mu(xval,alpha_t,beta_t)
     xy <- c(xinf, xsup, min(yval), max(yval))
     plot(xy[1:2], xy[3:4], type="n", adj=0.5, axes=T, cex=0.9,
          xlab='Stimulus level', ylab='Subjective level',
          main='Psychophysical function')
     lines (xval, yval,type='l',col='black', lwd=lw/2)
     if (!det) {
-        lines(Standard, mu_st, type='p', col='blue', lwd=lw)
-        text(Standard,mu_st,labels='   Standard', pos=4, offset=0.25,cex=0.75)
-        lines(c(xinf, Standard, Standard),c(mu_st, mu_st, xy[3]),lty=3,col='black')
-        if (is.double(PSE) && !same) {
+        lines(standard, mu_st, type='p', col='blue', lwd=lw)
+        text(standard,mu_st,labels='   standard', pos=4, offset=0.25,cex=0.75)
+        lines(c(xinf, standard, standard),c(mu_st, mu_st, xy[3]),lty=3,col='black')
+        if (is.numeric(PSE) && !same) {
             lines(c(xinf, PSE, PSE),c(mu_st, mu_st, xy[3]),lty=3,col='black')
             text(PSE,xy[3]+0.08*(xy[4]-xy[3]),labels=paste(' PSE = ',round(PSE, digits=3)),
                  pos=4, offset=0.25, cex=0.75)
         }
     } else {
-        mu_thr <- mu(Thr_84,Alpha_t,Beta_t)
+        mu_thr <- mu(Thr_84,alpha_t,beta_t)
         lines(c(xinf, Thr_84, Thr_84),c(mu_thr, mu_thr, xy[3]),lty=3,col='black')
         text(Thr_84,xy[3]+0.08*(xy[4]-xy[3]),
              labels=substitute(paste(theta,"=",label),list(label=Thr_84)),
@@ -142,12 +142,12 @@ plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_8
     }
     xpos <- xinf+0.05*(xsup-xinf)
     ypos <-  xy[3]+0.9*(xy[4]-xy[3])
-    text(xpos,ypos,labels=substitute(paste(alpha[t],"=",label),list(label=Alpha_t)), pos=4, cex=0.75)
+    text(xpos,ypos,labels=substitute(paste(alpha[t],"=",label),list(label=alpha_t)), pos=4, cex=0.75)
     xpos <- xinf+0.05*(xsup-xinf)
     ypos <- xy[3]+0.8*(xy[4]-xy[3])
-    text(xpos,ypos,labels=substitute(paste(beta[t],"=",label),list(label=Beta_t)),pos=4, cex=0.75)
+    text(xpos,ypos,labels=substitute(paste(beta[t],"=",label),list(label=beta_t)),pos=4, cex=0.75)
     #Part 2
-    xsup2 <- max(abs(c(8, Delta_1, Delta_2))); xsup2 <- ceiling(xsup2); xinf2 <- -xsup2
+    xsup2 <- max(abs(c(8, delta_1, delta_2))); xsup2 <- ceiling(xsup2); xinf2 <- -xsup2
     step2 <- (xsup2-xinf2)/800
     xval2 <- seq(xinf2,xsup2,step2)
     yval <- dnorm(xval2,0,sqrt(2))
@@ -157,16 +157,16 @@ plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_8
     lines (xval2,yval,type='l',col='black',lwd=lw)
     lines (c(0,0),c(0,dnorm(0,0,sqrt(2))),lty=3,col='black')
     yval2 <- 1.2*dnorm(0,0,sqrt(2))
-    lines(c(Delta_1,Delta_1),c(0,yval2),lty=2, col='black', lwd=lw/2)
-    lines(c(Delta_2,Delta_2),c(0,yval2),lty=2, col='black', lwd=lw/2)
+    lines(c(delta_1,delta_1),c(0,yval2),lty=2, col='black', lwd=lw/2)
+    lines(c(delta_2,delta_2),c(0,yval2),lty=2, col='black', lwd=lw/2)
     lines(c(xinf2,xsup2),c(0,0),lty=1, col='black', lwd=lw/2)
-    text(Delta_1, yval2, pos=2,cex=0.75,
-         labels=substitute(paste(delta[1],"=",label),list(label=Delta_1)))
-    text(Delta_2, yval2, pos=4, cex=0.75,
-         labels=substitute(paste(delta[2],"=",label),list(label=Delta_2)))
+    text(delta_1, yval2, pos=2,cex=0.75,
+         labels=substitute(paste(delta[1],"=",label),list(label=delta_1)))
+    text(delta_2, yval2, pos=4, cex=0.75,
+         labels=substitute(paste(delta[2],"=",label),list(label=delta_2)))
     text(0,0,pos=1,labels='0')
     #Part 3
-    psycho_0 <- Psy(Standard, xval, Alpha_st, Beta_st, Alpha_t, Beta_t, Delta_1, Delta_2, lapses*0)
+    psycho_0 <- Psy(standard, xval, alpha_st, beta_st, alpha_t, beta_t, delta_1, delta_2, lapses*0)
     plot(xy[1:2], c(0,1), type="n", cex=0.9,
          xlab='Stimulus level', ylab='Probability of response',
          main=expression(bold(paste('Ternary functions with all ', epsilon, ' = 0'))))
@@ -177,8 +177,8 @@ plot_results <- function(pars, Standard, Lev, F1, U1, S1, F2, U2, S2, PSE, Thr_8
     lines(xval,psycho_0[5,],col='gray', type='l', lwd=lw)#[0.5 0.5 0.5]
     lines(xval,psycho_0[6,],col='cyan', type='l', lwd=lw)
     if (!det) {
-        lines(c(Standard, Standard),c(0,1),col='black', lty=3)
-        if (is.double(PSE)) lines(c(PSE, PSE),c(0, 1),col='black')
+        lines(c(standard, standard),c(0,1),col='black', lty=3)
+        if (is.numeric(PSE)) lines(c(PSE, PSE),c(0, 1),col='black')
     } else {
         lines(c(Thr_84, Thr_84),c(0,1),col='black')
     }

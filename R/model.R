@@ -545,6 +545,7 @@ fit_model = function(data, standard, format,
                    DL = DL,
                    Threshold_84 = Thr_84
     )
+
     class(report) <- "fit"
     return(report)
 }
