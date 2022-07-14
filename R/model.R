@@ -509,7 +509,9 @@ fit_model = function(data, standard, format,
                    delta1_bounds = delta1_bounds,
                    width_bounds = width_bounds,
                    boundaries_reached = warn,
+                   alpha_st = params[1],
                    alpha_t = params[2],
+                   beta_st = params[3],
                    beta_t = params[4],
                    mu_s_at_standard_level = mu(standard,params[1],params[3]),
                    mu_t_at_standard_level = mu(standard,params[2],params[4]),
@@ -533,9 +535,16 @@ fit_model = function(data, standard, format,
                    kappa_UintoS_2 = params[22],
                    kappa_SintoF_2 = params[23],
                    kappa_SintoU_2 = params[24],
+                   same = logs[1],
+                   ter = logs[2],
+                   bin = logs[3],
+                   equ = logs[4],
+                   det = logs[5],
+                   lapses = params[7:24],
                    PSE = PSE,
                    DL = DL,
-                   Threshold_84 = Thr_84)
+                   Threshold_84 = Thr_84
+                   )
     class(report) <- "fit"
     return(report)
 }
