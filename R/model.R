@@ -197,9 +197,9 @@ fit_TIM_2P <- function(data, standard, format,
 
     ### Main ###
     output = fit_model(data, standard, format,
-                      alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
-                      alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
-                      model, criterion, type, plot, disp)
+                       alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
+                       alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
+                       model, criterion, type, plot, disp)
     return(output)
 }
 
@@ -544,7 +544,8 @@ fit_model = function(data, standard, format,
                    PSE = PSE,
                    DL = DL,
                    Threshold_84 = Thr_84
-                   )
+    )
+
     class(report) <- "fit"
     return(report)
 }
