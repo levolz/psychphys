@@ -8,7 +8,7 @@ plot_psychphys <- function(){
 # plot decision boundary function
 plot_boundary <- function(model){
 
-    d1 = model$Delta_1; d2 = model$Delta_2
+    d1 = model$delta_1; d2 = model$delta_2
     xsup <- max(abs(c(8, d1, d2))); # take absmax of decision bounds for xlims
     xsup <- ceiling(xsup); # round up this value to whole number
     xinf <- -xsup # set negative version for lower bound

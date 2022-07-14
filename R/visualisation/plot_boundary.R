@@ -8,7 +8,7 @@ yval <- dnorm(xval2,0,sqrt(2)) # normal distribution (u=0,sd=2^0.5)
 
 x = c(xinf2,xsup2)
 y = c(0, 1.4*dnorm(0,0,sqrt(2)))
-step2 = step2,
+step2 = step2
 
 data <- data.frame(
     xval2 = xval2,
