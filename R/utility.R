@@ -1,33 +1,33 @@
 #' Get parameters out of vector of estimates
-GetParVec <- function (p, Model, logs, Bounds) {
+GetParVec <- function (p, model, logs, bounds) {
     npars <- length(p)
     p1 <- p>700
-    p <- colSums(rbind((1-p1)*(Bounds[1,1:npars]+Bounds[2,1:npars]*exp(p))/(1+exp(p)),
-                       p1*Bounds[2,1:npars]), na.rm=T)
+    p <- colSums(rbind((1-p1)*(bounds[1,1:npars]+bounds[2,1:npars]*exp(p))/(1+exp(p)),
+                       p1*bounds[2,1:npars]), na.rm=T)
     if (npars>6) {
         p[which(p[7:npars] < 0.001)+6] <- 0
         p[which(p[7:npars] > 0.999)+6] <- 1
     }
-    Alpha_st <- p[1]; Alpha_t <- p[2]; Beta_st <- p[3]; Beta_t <- p[4]; Delta_1 <- p[5]; Delta_2 <- p[5]+p[6]
-    if (logs[1]) {Alpha_st <- Alpha_t; Beta_st <- Beta_t}
-    if (logs[6]) Delta_2 <- Delta_1
+    alpha_st <- p[1]; alpha_t <- p[2]; Beta_st <- p[3]; beta_t <- p[4]; delta_1 <- p[5]; delta_2 <- p[5]+p[6]
+    if (logs[1]) {alpha_st <- alpha_t; Beta_st <- beta_t}
+    if (logs[6]) delta_2 <- delta_1
     lapses <- c(); add <- 0
     for (i in c(1,2)) {
-        if (Model[i]==0) {
+        if (model[i]==0) {
             lapses <- c(lapses, rep(0,times=9)); add <- 0
-        } else if (Model[i]==1) {
+        } else if (model[i]==1) {
             lapses <- c(lapses, p[add+(7:9)], p[add+10], 1-p[add+10], p[add+11], 1-p[add+11], p[add+12], 1-p[add+12]); add <- 6
-        } else if (Model[i]==2) {
+        } else if (model[i]==2) {
             lapses <- c(lapses, p[add+(7:8)], 0, p[add+9], 1-p[add+9], p[add+10], 1-p[add+10], 0, 0); add <- 4
-        } else if (Model[i]==3) {
+        } else if (model[i]==3) {
             lapses <- c(lapses, p[add+7], 0, p[add+8], p[add+9], 1-p[add+9], 0, 0, p[add+10], 1-p[add+10]); add <- 4
-        } else if (Model[i]==4) {
+        } else if (model[i]==4) {
             lapses <- c(lapses, 0, p[add+7], p[add+8], 0, 0, p[add+9], 1-p[add+9], p[add+10], 1-p[add+10]); add <- 4
-        } else if (Model[i]==5) {
+        } else if (model[i]==5) {
             lapses <- c(lapses, p[add+7], 0, 0, p[add+8], 1-p[add+8], 0, 0, 0, 0); add <- 2
-        } else if (Model[i]==6) {
+        } else if (model[i]==6) {
             lapses <- c(lapses, 0, p[add+7], 0, 0, 0, p[add+8], 1-p[add+8], 0, 0); add <- 2
-        } else if (Model[i]==7) {
+        } else if (model[i]==7) {
             lapses <- c(lapses, 0, 0, p[add+7], 0, 0, 0, 0, p[add+8], 1-p[add+8]); add <- 2
         }
     }
@@ -41,7 +41,7 @@ GetParVec <- function (p, Model, logs, Bounds) {
         lapses[6] <- 0; lapses[7] <- 1; lapses[15] <- 0; lapses[16] <- 1
         lapses[8] <- 0; lapses[9] <- 1; lapses[17] <- 0; lapses[18] <- 1
     }
-    all.pars <- c(Alpha_st, Alpha_t, Beta_st, Beta_t, Delta_1, Delta_2, lapses)
+    all.pars <- c(alpha_st, alpha_t, Beta_st, beta_t, delta_1, delta_2, lapses)
     return(all.pars)
 }
 
@@ -50,17 +50,23 @@ GetParVec <- function (p, Model, logs, Bounds) {
 #' Psychophysical function
 mu <- function(x, a, b) {
     x1 <- (x-a)/b
-    x2 <- x1<700
-    y <- colSums(rbind(x2*log(1+2*exp(x1)), (1-x2)*(log(2)+x1)),na.rm=T)
-    return(y)
+    if (x1<700) {
+        return(log(1+2*exp(x1)))
+    }
+    return(log(2)+x1)
+    #y <- colSums(rbind(x2*log(1+2*exp(x1)), (1-x2)*(log(2)+x1)),na.rm=T)
+    #return(y)
 }
 
 
 #' Inverse psychophysical function
 muinv <- function(a, b, y) {
-    y1 <- y<700
-    x <- colSums(rbind(y1*(a+b*log((exp(y)-1)/2)), (1-y1)*((y-log(2))*b+a)), na.rm=T)
-    return(x)
+    if (y<700){
+        return(a+b*log((exp(y)-1)/2))
+    }
+    return((y-log(2))*b+a)
+    #x <- colSums(rbind(y1*(a+b*log((exp(y)-1)/2)), (1-y1)*((y-log(2))*b+a)), na.rm=T)
+    #return(x)
 }
 
 
@@ -100,15 +106,15 @@ Psy <- function(st, t, a_st, b_st, a_t, b_t, d_1, d_2, l) {
 }
 
 #' Likelihood function
-LogLikelihood <- function(x, F1, U1, S1, F2, U2, S2, Standard, Lev, Models, logs, Bounds) {
-    all.pars <- GetParVec(x, Models, logs, Bounds)
+LogLikelihood <- function(x, F1, U1, S1, F2, U2, S2, standard, Lev, models, logs, bounds) {
+    all.pars <- GetParVec(x, models, logs, bounds)
     lapses <- all.pars[-1:-6]
     if (any(lapses<0) || any (lapses>1)) {
         L <- 1.0e10
     } else if (any(!is.finite(all.pars)) || any (is.complex(all.pars))) {
         L <- 1.0e10
     } else {
-        p.output <- Psy(Standard, Lev, all.pars[1], all.pars[3], all.pars[2], all.pars[4],
+        p.output <- Psy(standard, Lev, all.pars[1], all.pars[3], all.pars[2], all.pars[4],
                         all.pars[5], all.pars[6], lapses)
         P_F1 <- p.output[1,]; P_U1 <- p.output[2,]; P_S1 <- p.output[3,]
         P_F2 <- p.output[4,]; P_U2 <- p.output[5,]; P_S2 <- p.output[6,]
