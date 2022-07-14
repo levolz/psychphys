@@ -1,8 +1,65 @@
 # plot psychophysical function
-plot_psychphys <- function(){
+plot_psychphys <- function(model){
 
-    #alpha_st, beta_st, lapses,
+    alpha_st <- model$alpha_st
+    alpha_t <- model$alpha_t
+    beta_st <- model$beta_st
+    beta_t <- model$beta_t
+    same <- model$same
+    det <- model$det
+    xinf <- min(model$data[1,])
+    xsup <- max(model$data[1,])
+    thr_84 <- model$Threshold_84
+    standard <- model$standard
+    pse <- model$PSE
 
+    step <- (xsup-xinf)/800
+    xval <- seq(xinf,xsup,step)
+    mu_st <- mu(standard, alpha_st, beta_st)
+    yval <- mu(xval, alpha_t, beta_t)
+    xy <- c(xinf, xsup, min(yval), max(yval))
+
+    plot_data = data.frame(x = xval, y = yval)
+
+    psychphys <- ggplot(data = plot_data, aes(x = x, y = y)) +
+        geom_line() +
+        theme_minimal() +
+        ggtitle("Psychophysical function") +
+        xlab("Stimulus level") +
+        ylab("Subjective level")
+
+    if(det){
+        mu_thr <- mu(thr_84, alpha_t, beta_t)
+        psychphys <- psychphys +
+            geom_segment(aes(x = xinf, y = mu_thr,
+                             xend = thr_84, yend = mu_thr,
+                             linetype = 3)) +
+            geom_segment(aes(x = thr_84, y = mu_thr,
+                             xend = thr_84, yend = y[1],
+                             linetype = 3)) +
+            geom_point(aes(x = thr_84, y = mu_thr), color = "blue") +
+            scale_linetype_identity()
+    } else {
+        psychphys <- psychphys + #add 'Standard' text
+            geom_segment(aes(x = xinf, y = mu_st,
+                             xend = standard, yend = mu_st,
+                             linetype = 3)) +
+            geom_segment(aes(x = standard, y = mu_st,
+                             xend = standard, yend = y[1],
+                             linetype = 3)) +
+            geom_point(aes(x = standard, y = mu_st), color = "blue") +
+            scale_linetype_identity()
+
+        if(is.numeric(pse) & !same){
+            psychphys <- psychphys +
+                geom_segment(aes(x = pse, y = mu_st,
+                                 xend = pse, yend = y[1],
+                                 linetype = 3)) +
+                geom_point(aes(x = pse, y = mu_st), color = "red")
+        }
+    }
+
+    return(psychphys)
 }
 
 # plot decision boundary function
