@@ -1,3 +1,6 @@
+#' whole number check
+is.wholenumber <- function(x, tol = .Machine$double.eps^0.5) abs(x - round(x)) < tol
+
 #' Get parameters out of vector of estimates
 GetParVec <- function (p, model, logs, bounds) {
     npars <- length(p)
