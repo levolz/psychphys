@@ -192,7 +192,6 @@ fit_TIM_2P <- function(data, standard, format,
     } else {
         criterion = "Not applicable"
     }
-
     if (!identical(type,"same") && !identical(type,"diff")) {
         stop("Wrong string for type (must be 'same' or 'diff', case insensitive)")}
     if (!is.logical(plot) || length (plot)!=1) {
