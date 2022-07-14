@@ -105,7 +105,7 @@
 fit_TIM_2P <- function(data, standard, format,
                        alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
                        alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
-                       model, criterion, type, plot = FALSE, disp = FALSE){
+                       model, criterion, type, plot_graphs = FALSE, disp = FALSE){
 
     if (is.character(model)) {
         model <- tolower(model)
@@ -154,7 +154,7 @@ fit_TIM_2P <- function(data, standard, format,
 
     if (!is.numeric(alpha_start) || any(alpha_start>alpha_bounds[2]) || any(alpha_start<alpha_bounds[1])) {
         stop("Invalid alpha_start: must be real number within supplied alpha_bounds")}
-    if (!is.numeric(beta_start) || beta_start<0 || any(beta_start>beta_bounds[2]) || any(beta_start<beta_bounds[1])) {
+    if (!is.numeric(beta_start) || any(beta_start<0) || any(beta_start>beta_bounds[2]) || any(beta_start<beta_bounds[1])) {
         stop("Invalid beta_start: must be non-negative real number within supplied beta_bounds)")}
     if (!is.numeric(delta1_start) || any(delta1_start>delta1_bounds[2]) || any(delta1_start<delta1_bounds[1])) {
         stop("Invalid delta1_start: must be real number within supplied delta1_bounds")}
@@ -206,7 +206,11 @@ fit_TIM_2P <- function(data, standard, format,
     output = fit_model(data, standard, format,
                        alpha_bounds, beta_bounds, delta1_bounds, width_bounds,
                        alpha_start, beta_start, delta1_start, width_start, eps_start, kappa_start,
-                       model, criterion, type, plot, disp)
+                       model, criterion, type, plot_graphs, disp)
+
+    if (plot_graphs){
+        #plot_results()
+    }
     return(output)
 }
 
